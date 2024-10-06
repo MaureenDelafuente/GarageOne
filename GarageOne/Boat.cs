@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace GarageOne;
+﻿namespace GarageOne;
 
 public class Boat : Vehicle
 {

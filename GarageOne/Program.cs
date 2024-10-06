@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.Design;
-
-namespace GarageOne
+﻿namespace GarageOne
 {
     internal class Program
     {
-        private static GarageHandler garageHandler = new GarageHandler();
-        private static UI ui = new UI(garageHandler);
+        private static IHandler garageHandler = new GarageHandler();
+        private static IUI ui = new UI(garageHandler);
 
         static void Main(string[] args)
         {

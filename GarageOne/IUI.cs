@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace GarageOne;
+﻿namespace GarageOne;
 
 public interface IUI
 {

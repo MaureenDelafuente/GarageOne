@@ -1,9 +1,12 @@
 ﻿using System.Collections;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.JavaScript;
 
 namespace GarageOne;
 
+public class GarageData
+{
+    public int Capacity { get; set; }
+    public List<Vehicle> Vehicles { get; set; }
+}
 public class Garage<T> : IEnumerable<T> where T : Vehicle
 {
     private Vehicle?[] vehicles;
@@ -40,17 +43,18 @@ public class Garage<T> : IEnumerable<T> where T : Vehicle
         }
     }
 
-    public void AddVehicle(Vehicle vehicle)
+    public bool AddVehicle(Vehicle vehicle)
     {
         for (int i = 0; i < vehicles.Length; i++)
         {
             if (vehicles[i] == null)
             {
                 vehicles[i] = vehicle;
-                return;
+                return true; // added successfully
             }
         }
 
         Console.WriteLine("There is not more space in the garage");
+        return false; // could not add
     }
 }

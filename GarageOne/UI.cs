@@ -1,14 +1,10 @@
-﻿using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
-using System.Security.Cryptography.X509Certificates;
-
-namespace GarageOne;
+﻿namespace GarageOne;
 
 public class UI : IUI
 {
-    private GarageHandler garageHandler;
+    private IHandler garageHandler;
 
-    public UI(GarageHandler garageHandler)
+    public UI(IHandler garageHandler)
     {
         this.garageHandler = garageHandler;
     }
@@ -19,7 +15,7 @@ public class UI : IUI
         while (start)
         {
             PrintMenu();
-            string command = Console.ReadLine();
+            string command = ReadString("Menu option");
             switch (command)
             {
                 case "1":
@@ -41,9 +37,38 @@ public class UI : IUI
                     NewGarage();
                     break;
                 case "7":
+                    SaveGarage();
+                    break;
+                case "8":
+                    LoadGarage();
+                    break;
+                case "0":
                     start = false;
                     break;
             }
+        }
+    }
+
+    private void LoadGarage()
+    {
+        bool success = garageHandler.LoadGarage();
+        if (success)
+        {
+            Console.WriteLine("Successfully saved garage!");
+        }
+        else
+        {
+            Console.WriteLine("Failed to save garage!");
+        }
+    }
+
+    private void SaveGarage()
+    {
+        bool success = garageHandler.SaveGarage();
+        if (success) {
+            Console.WriteLine("Successfully saved garage!");
+        } else {
+            Console.WriteLine("Failed to save garage!");
         }
     }
 
@@ -56,7 +81,9 @@ public class UI : IUI
         Console.WriteLine("4. Remove Vehicle");
         Console.WriteLine("5. Search Vehicle");
         Console.WriteLine("6. New Garage");
-        Console.WriteLine("7. Exit program");
+        Console.WriteLine("7. Save Garage");
+        Console.WriteLine("8. Load Garage");
+        Console.WriteLine("0. Exit program");
     }
 
     private void NewGarage()
@@ -65,8 +92,15 @@ public class UI : IUI
         try
         {
             string input = Console.ReadLine() ?? "";
-            int numberOfSpaces = int.Parse(input);
-            garageHandler.NewGarage(numberOfSpaces);
+            int nrOfSpaces = int.Parse(input);
+            bool success = garageHandler.NewGarage(nrOfSpaces);
+            if (success) {
+                Console.WriteLine($"Created a new garage with {nrOfSpaces} parking spaces.");
+            }
+            else
+            {
+                Console.WriteLine("Failed to create new garage.");
+            }
         }
         catch (Exception exception)
         {
@@ -78,7 +112,15 @@ public class UI : IUI
     {
         Console.WriteLine("Which vehicle do you want to remove?");
         string regNr = ReadString("Registration number");
-        garageHandler.RemoveVehicle(regNr);
+        bool success = garageHandler.RemoveVehicle(regNr);
+        if (success)
+        {
+            Console.WriteLine($"Removed the vehicle with registration number {regNr}.");
+        }
+        else
+        {
+            Console.WriteLine($"Failed to remove a vehicle with registration number {regNr}.");
+        }
     }
 
     private void AddVehicle()
@@ -109,7 +151,15 @@ public class UI : IUI
                 return;
         }
 
-        garageHandler.AddVehicle(newVehicle);
+        bool success = garageHandler.AddVehicle(newVehicle);
+        if (success)
+        {
+            Console.WriteLine($"Added vehicle: {newVehicle}");
+        }
+        else
+        {
+            Console.WriteLine($"Failed to add vehicle ({newVehicle})");
+        }
     }
 
     private Vehicle NewAirplane()
@@ -144,7 +194,7 @@ public class UI : IUI
         string regNr = ReadString("Registration number");
         string color = ReadString("Color");
         int nrOfWheels = ReadInt("Number of wheels");
-        bool isElectric = ReadBool("Is the car electric?");
+        bool isElectric = ReadBool("Is the car electric (yes/no)?");
         return new Car(regNr, color, nrOfWheels, isElectric);
     }
 
@@ -187,7 +237,7 @@ public class UI : IUI
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Invalid number '{e}', try again!");
+                Console.WriteLine($"Invalid number, try again!");
             }
         }
     }
@@ -237,25 +287,14 @@ public class UI : IUI
 
     private void Search()
     {
-        bool start = true;
-        while (start)
+        string regNr = ReadString("Registration number (empty for any)");
+        string color = ReadString("Color (empty for any)");
+        int nrOfWheels = ReadInt("Number of wheels (-1 for any)");
+        var searchResults = garageHandler.Search(regNr, color, nrOfWheels);
+
+        foreach (Vehicle v in searchResults)
         {
-            String command = Console.ReadLine();
-            switch (command)
-            {
-                case "1":
-                    break;
-
-
-                // private string 
-                //private string color;
-                //private int nrOfWheels;
-            }
-
-
-            //■. T.ex efter alla svarta
-            //fordon med fyra hjul, alla rosa motorcyklar med tre hjul eller alla lastbilar.
-            // ■ Sökningen ska vara okänslig för stora och små bokstäver, t.ex.ska både "ABC123" och "Abc123" fungera.
+            Console.WriteLine(v);
         }
     }
 }
